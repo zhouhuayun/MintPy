@@ -25,44 +25,33 @@ RUN apt-get update && \
 RUN ln -sf bash /bin/sh
 
 # Prepare build time environment for conda and mintpy
-ARG MINTPY_HOME=/home/python/MintPy
-ARG PYTHON3DIR=/home/python/miniconda3
-ARG PYAPS_HOME=/home/python/PyAPS
+ARG MINTPY_HOME=/home/development/MintPy
+ARG PYTHON3DIR=/home/development/miniconda3
+ARG PYAPS_HOME=/home/development/PyAPS
 ARG WORK_DIR=/home/work/
 
 # Prepare container environment
 ENV MINTPY_HOME=${MINTPY_HOME}
 ENV PYTHON3DIR=${PYTHON3DIR}
 ENV PYAPS_HOME=${PYAPS_HOME}
-ENV PATH=${MINTPY_HOME}/mintpy:${MINTPY_HOME}/sh:${PYTHON3DIR}/bin:${PATH}
+ENV PATH=${MINTPY_HOME}/mintpy:${PYTHON3DIR}/bin:${PATH}
 ENV PYTHONPATH=${PYTHONPATH}:${MINTPY_HOME}:${PYAPS_HOME}
-ENV PROJ_LIB=${PYTHON3DIR}/share/proj
 
 # Set workdir
-WORKDIR /home/python
+WORKDIR /home/development
 
-# Pull and config mintpy
-RUN git clone https://github.com/insarlab/MintPy.git
-
-# Pull and config PyAPS
-RUN git clone https://github.com/yunjunz/pyaps3.git PyAPS
+# Pull and config MintPy and PyAPS
+RUN git clone https://github.com/insarlab/MintPy.git ${MINTPY_HOME}
+RUN git clone https://github.com/yunjunz/pyaps3.git ${PYAPS_HOME}/pyaps3
 
 # Install miniconda
-RUN wget https://repo.continuum.io/miniconda/Miniconda3-4.5.4-Linux-x86_64.sh && \
-    chmod +x ./Miniconda3-4.5.4-Linux-x86_64.sh  && \
-    ./Miniconda3-4.5.4-Linux-x86_64.sh -b -p ${PYTHON3DIR} && \
-    rm ./Miniconda3-4.5.4-Linux-x86_64.sh
+RUN wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
+    chmod +x ./Miniconda3-latest-Linux-x86_64.sh  && \
+    ./Miniconda3-latest-Linux-x86_64.sh -b -p ${PYTHON3DIR} && \
+    rm ./Miniconda3-latest-Linux-x86_64.sh
 
-# Install dependencies
-RUN ${PYTHON3DIR}/bin/conda config --add channels conda-forge && \
-    ${PYTHON3DIR}/bin/conda install --yes --file ${MINTPY_HOME}/docs/conda.txt
-
-# Install pykml
-RUN ${PYTHON3DIR}/bin/pip install git+https://github.com/yunjunz/pykml.git
-
-# Install DASK - not tested yet
-#RUN mkdir -p /home/.config/dask && \
-#    cp ${MINTPY_HOME}/mintpy/defaults/dask_mintpy.yaml /home/.config/dask/dask_mintpy.yaml
+# Install dependencies with conda environment
+RUN ${PYTHON3DIR}/bin/conda env create -f ${MINTPY_HOME}/docs/conda_env.yml
 
 # Set working directory ENV - map a host data volume to this using "docker build . -t mintpy && docker run mintpy -v /host/path/to/data:/home/work/"
 RUN mkdir -p ${WORK_DIR}
