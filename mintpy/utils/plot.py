@@ -166,7 +166,7 @@ def add_figure_argument(parser):
 
     # colormap
     fig.add_argument('-c', '--colormap', dest='colormap',
-                     help='colormap used for display, i.e. jet, RdBu, hsv, jet_r, temperature, viridis,  etc.\n'
+                     help='colormap used for display, i.e. cmy, RdBu, RdBu_r, jet, hsv, temperature, viridis,  etc.\n'
                           'colormaps in Matplotlib - http://matplotlib.org/users/colormaps.html\n'
                           'colormaps in GMT - http://soliton.vm.bytemark.co.uk/pub/cpt-city/')
     fig.add_argument('--cm-lut', dest='cmap_lut', type=int, default=256, metavar='NUM',
@@ -549,14 +549,47 @@ def auto_shared_lalo_location(axs, loc=(1,0,0,1), flatten=False):
 
 
 def check_colormap_input(metadata, cmap_name=None, datasetName=None, cmap_lut=256, print_msg=True):
-    gray_dataset_key_words = ['coherence', 'temporal_coherence',
-                              '.cor', '.mli', '.slc', '.amp', '.ramp']
+    gray_dataset_keywords = ['coherence',
+                             'temporalCoherence',
+                             'waterMask',
+                             'shadowMask',
+                             'magnitude',
+                             'intensity',
+                             'cor',
+                             'mli',
+                             'slc',
+                             'amp',
+                             'ramp']
+
+    dis_dataset_keywords = ['timeseries',
+                            'displacement',
+                            'unwrapPhase',
+                            'wrapPhase',
+                            'iono',
+                            'rangeOffset',
+                            'azimuthOffset',
+                            'velocity',
+                            'velocityStd',
+                            'giantTimeseries',
+                            'recons',
+                            'rawts',
+                            'unw',
+                            'int',
+                            'flat']
+
     if not cmap_name:
-        if any(i in gray_dataset_key_words for i in [metadata['FILE_TYPE'],
-                                                     str(datasetName).split('-')[0]]):
+        # get keyword of input dataset
+        k = metadata['FILE_TYPE'].split('-')[0].split('_')[0].replace('.','')
+        if datasetName:
+            k = datasetName.split('-')[0].split('_')[0].replace('.','')
+
+        # find corresponding colormap
+        if k in gray_dataset_keywords:
             cmap_name = 'gray'
+        elif k in dis_dataset_keywords:
+            cmap_name = 'cmy'
         else:
-            cmap_name = 'jet'
+            cmap_name = 'viridis'
     if print_msg:
         print('colormap:', cmap_name)
 
@@ -980,7 +1013,7 @@ def plot_coherence_matrix(ax, date12List, cohList, date12List_drop=[], plot_dict
     if 'markersize'  not in plot_dict.keys():   plot_dict['markersize']  = 16
     if 'disp_title'  not in plot_dict.keys():   plot_dict['disp_title']  = True
     if 'fig_title'   not in plot_dict.keys():   plot_dict['fig_title']   = 'Coherence Matrix'
-    if 'colormap'    not in plot_dict.keys():   plot_dict['colormap']    = 'jet'
+    if 'colormap'    not in plot_dict.keys():   plot_dict['colormap']    = 'RdBu'
     if 'cbar_label'  not in plot_dict.keys():   plot_dict['cbar_label']  = 'Coherence'
     if 'ylim'        not in plot_dict.keys():   plot_dict['ylim']        = (0., 1.)
     if 'disp_cbar'   not in plot_dict.keys():   plot_dict['disp_cbar']   = True
