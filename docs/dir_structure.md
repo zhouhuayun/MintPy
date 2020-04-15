@@ -270,8 +270,8 @@ mintpy.load.corFile          = $DATA_DIR/SanFranSenDT42/stack/cohStack.vrt
 mintpy.load.connCompFile     = $DATA_DIR/SanFranSenDT42/stack/connCompStack.vrt
 ##---------geometry datasets:
 mintpy.load.demFile          = $DATA_DIR/SanFranSenDT42/DEM/SRTM_3arcsec.dem
-mintpy.load.incAngleFile     = $DATA_DIR/SanFranSenDT42/incidenceAngle/20150605_20150512.vrt
-mintpy.load.azAngleFile      = $DATA_DIR/SanFranSenDT42/azimuthAngle/20150605_20150512.vrt
+mintpy.load.incAngleFile     = $DATA_DIR/SanFranSenDT42/incidenceAngle/*.vrt
+mintpy.load.azAngleFile      = $DATA_DIR/SanFranSenDT42/azimuthAngle/*.vrt
 mintpy.load.waterMaskFile    = $DATA_DIR/SanFranSenDT42/mask/watermask.msk
 ```
 
